@@ -465,7 +465,8 @@ service apache2 restart
 ### Testing
 ![Testing No 10](image/Nomor%2010/1.png)
 ![Testing No 10](image/Nomor%2010/2.png)
-Nomor 11
+
+## Nomor 11
 
 ### Soal
 Akan tetapi, pada folder `/public`, Loid ingin hanya dapat melakukan directory listing saja.
