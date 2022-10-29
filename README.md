@@ -206,3 +206,101 @@ Kemudian melakukan restart bind9 dengan perintah `service bind9 restart`
 `host -t CNAME www.eden.wise.A06.com`
 
 ![dokumentasi 3-3](image/Nomor%203/3.png)
+
+## Nomor 4
+
+### Soal
+
+Buat juga reverse domain untuk domain utama!
+
+### Cara Pengerjaan
+
+1. Pada WISE edit file `/etc/bind/named.conf.local` menjadi sebagai berikut:
+
+```
+zone "wise.A06.com" {
+        type master;
+        notify yes;
+        also-notify { 10.2.2.2; };
+        allow-transfer { 10.2.2.2; };
+        file "/etc/bind/wise/wise.A06.com";
+};
+
+zone "3.2.10.in-addr.arpa" {
+        type master;
+        notify yes;
+        also-notify { 10.2.2.2; };
+        allow-transfer { 10.2.2.2; };
+        file "/etc/bind/wise/3.2.10.in-addr.arpa";
+};
+```
+
+2. Lakukan konfigurasi pada file `/etc/bind/wise/3.2.10.in-addr.arpa` sebagai berikut:
+
+```
+$TTL    604800
+@       IN      SOA     wise.A06.com. root.wise.A06.com. (
+                     2410202202         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+3.2.10.in-addr.arpa.    IN      NS      wise.A06.com.
+2                       IN      PTR     wise.A06.com.
+```
+
+3. Lakukan testing dengan command `host -t PTR 10.2.3.2`
+
+![dokumentasi 4-1](image/Nomor%204/1.png)
+
+## Nomor 5
+
+### Soal
+
+Agar dapat tetap dihubungi jika server WISE bermasalah, buatlah juga Berlint sebagai DNS Slave untuk domain utama!
+
+### Cara Pengerjaan
+
+1. Lakukan konfigurasi pada node Berlint pada file `/etc/bind/named.conf.local` untuk melakukan konfigurasi DNS Slave yang mengarah ke WISE:
+
+```
+zone "wise.A06.com" {
+        type slave;
+        masters { 10.2.3.2; };
+        file "/var/lib/bind/wise.A06.com";
+};
+
+zone "3.2.10.in-addr.arpa" {
+        type slave;
+        masters { 10.2.3.2; };
+        file "/var/lib/bind/3.2.10.in-addr.arpa";
+};
+```
+
+2. Kemudian melakukan command
+
+```
+apt-get update
+apt-get install bind9 -y
+```
+
+yang sudah dijelaskan di nomor 1 karena Berlint akan dijadikan DNS Slave. Kemudian restart service bind9 dengan `service bind9 restart`.
+
+3. Lakukan testing
+
+Stop service bind9 pada WISE dengan command `service bind9 stop`:
+
+![dokumentasi 5-1](image/Nomor%205/1.png)
+
+Kemudian lakukan ping pada salah satu client:
+
+![dokumentasi 5-2](image/Nomor%205/2.png)
+
+## Nomor 6
+
+### Soal
+
+Karena banyak informasi dari Handler, buatlah subdomain yang khusus untuk operation yaitu operation.wise.yyy.com dengan alias www.operation.wise.yyy.com yang didelegasikan dari WISE ke Berlint dengan IP menuju ke Eden dalam folder operation!
+
+### Cara Pengerjaan
