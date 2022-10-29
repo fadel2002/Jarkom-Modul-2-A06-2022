@@ -304,3 +304,239 @@ Kemudian lakukan ping pada salah satu client:
 Karena banyak informasi dari Handler, buatlah subdomain yang khusus untuk operation yaitu operation.wise.yyy.com dengan alias www.operation.wise.yyy.com yang didelegasikan dari WISE ke Berlint dengan IP menuju ke Eden dalam folder operation!
 
 ### Cara Pengerjaan
+
+
+## Nomor 12
+
+### soal
+
+Tidak hanya itu, Loid juga ingin menyiapkan error file 404.html pada folder /error untuk mengganti error kode pada apache.
+
+### Cara Pengerjaan
+
+Menambahkan keyword ```ErrorDocument <kode error> <directory>``` ke dalam file pengaturan apache eden.wise.A06.com ```/etc/apache2/sites-available/eden.wise.A06.com.conf```. Untuk soal ini error yang diganti adalah error 404, 500, 502, 503, dan 504, kemudian directory file error adalah ```/error/404.html```.
+
+```bash
+<VirtualHost *:80>
+
+        ...
+
+        ErrorDocument 404 /error/404.html
+        ErrorDocument 500 /error/404.html
+        ErrorDocument 502 /error/404.html
+        ErrorDocument 503 /error/404.html
+        ErrorDocument 504 /error/404.html
+
+        ...
+
+</VirtualHost>
+```
+
+![Dokumentasi 12-1](image/Nomor%2012/nomor%2012-1.png)
+
+![Dokumentasi 12-2](image/Nomor%2012/nomor%2012-2.png)
+
+## Nomor 13
+
+### soal
+
+Loid juga meminta Franky untuk dibuatkan konfigurasi virtual host. Virtual host ini bertujuan untuk dapat mengakses file asset www.eden.wise.yyy.com/public/js menjadi www.eden.wise.yyy.com/js 
+
+### Cara Pengerjaan
+
+Dengan membuat alias "js" yang mengarah pada directory "public/js" pada file pengaturan apache eden.wise.A06.com.
+
+```bash
+<VirtualHost *:80>
+
+        ...
+		
+		Alias "js" "public/js"
+		
+		...
+
+</VirtualHost>
+```
+
+![Dokumentasi 13-1](image/Nomor%2013/nomor%2013-1.png)
+
+![Dokumentasi 13-2](image/Nomor%2013/nomor%2013-2.png)
+
+## Nomor 14
+
+### soal
+
+Loid meminta agar www.strix.operation.wise.yyy.com hanya bisa diakses dengan port 15000 dan port 15500 
+
+### Cara Pengerjaan
+
+Dengan membuat dua VirtualHost untuk www.strix.operation.wise.A06.com pada file pengaturannya ```/etc/apache2/sites-available/strix.operation.wise.A06.com.conf``` yang menggunakan port 15000 dan 15500. Isi kedua VirtualHost dibuat sama, perbedaan hanya pada port yang digunakan.
+
+```bash
+<VirtualHost *:15000>
+
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/strix.operation.wise.A06
+        ServerName strix.operation.wise.A06.com
+        ServerAlias www.strix.operation.wise.A06.com
+
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+		
+</VirtualHost>
+<VirtualHost *:15500>        
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/strix.operation.wise.A06
+        ServerName strix.operation.wise.A06.com
+        ServerAlias www.strix.operation.wise.A06.com
+        
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+
+</VirtualHost>
+```
+
+kemudian memasukkan port yang digunakan ke dalam file daftar port yang digunakan apache2 ```etc/apache2/ports.conf```.
+
+```bash
+Listen 80
+Listen 15000
+Listen 15500
+
+<IfModule ssl_module>
+        Listen 443
+</IfModule>
+
+<IfModule mod_gnutls.c>
+        Listen 443
+</IfModule>
+```
+
+![Dokumentasi 14-1](image/Nomor%2014/nomor%2014-1.png)
+
+![Dokumentasi 14-2](image/Nomor%2014/nomor%2014-2.png)
+
+## Nomor 15
+
+### soal
+
+dengan autentikasi username Twilight dan password opStrix dan file di /var/www/strix.operation.wise.yyy
+
+### Cara Pengerjaan
+
+Menambahkan authentication pada file pengaturan strix.operation.wise.A06.com.
+
+```bash
+<VirtualHost *:15000>
+
+		...
+        
+        <Directory /var/www/strix.operation.wise.A06>
+                AuthType Basic
+				AuthName \"Restricted Content\"
+                AuthUserFile /etc/apache2/strix.operation.wise.A06/.htpasswd
+                Require valid-user
+        </Directory>
+		
+		...
+		
+</VirtualHost>
+<VirtualHost *:15500>
+
+		...
+        
+        <Directory /var/www/strix.operation.wise.A06>
+                AuthType Basic
+				AuthName \"Restricted Content\"
+                AuthUserFile /etc/apache2/strix.operation.wise.A06/.htpasswd
+                Require valid-user
+        </Directory>
+		
+		...
+		
+</VirtualHost>
+```
+
+Kemudian membuat file authentication yang berada di AuthUserFile dengan menggunakan 
+
+```bash
+htpasswd -c -b "/etc/apache2/strix.operation.wise.A06/.htpasswd" Twilight opStrix
+```
+
+![Dokumentasi 15-1](image/Nomor%2014/nomor%2014-2.png)
+
+![Dokumentasi 15-2](image/Nomor%2015/nomor%2015-2.png)
+
+## Nomor 16
+
+### soal
+
+dan setiap kali mengakses IP Eden akan dialihkan secara otomatis ke www.wise.yyy.com
+
+### Cara Pengerjaan
+
+Pertama, mengaktifkan modul rewrite
+
+```bash
+a2enmod rewrite
+```
+
+kemudian memasukkan rewrite ke dalam file pengaturan default ```/etc/apache2/sites-available/000-default.conf```
+
+```bash
+<VirtualHost *:80>
+
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/html
+		
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+		
+		RewriteEngine On
+		RewriteRule /.* http://wise.A06.com/
+</VirtualHost>
+```
+
+![Dokumentasi 16-1](image/Nomor%2016/nomor%2016-1.png)
+
+![Dokumentasi 16-2](image/Nomor%2016/nomor%2016-2.png)
+
+## Nomor 17
+
+### soal
+
+Karena website www.eden.wise.yyy.com semakin banyak pengunjung dan banyak modifikasi sehingga banyak gambar-gambar yang random, maka Loid ingin mengubah request gambar yang memiliki substring “eden” akan diarahkan menuju eden.png. Bantulah Agent Twilight dan Organisasi WISE menjaga perdamaian!
+
+### Cara Pengerjaan
+
+Pertama, mengizinkan rewrite pada directory ```/var/www/eden.wise.A06.com``` dengan mengubah file pengaturan eden.wise.A06.com.
+
+```bash
+<VirtualHost *:80>
+
+        ...
+		
+		<Directory /var/www/eden.wise.A06.com>
+			Options +FollowSymLinks -Multiviews
+			AllowOverride All
+		</Directory>
+		
+		...
+
+</VirtualHost>
+```
+
+Kemudian membuat file rewrite ```/var/www/eden.wise.A06.com/.htaccess``` dengan isi
+
+```bash
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/public/images/(.*)eden(.*)
+RewriteCond %{REQUEST_URI} !/public/images/eden.png
+RewriteRule /.* http://eden.wise.A06.com/public/images/eden.png [L]
+```
+
+yang berfungsi mengubah semua request pada ```http://eden.wise.A06.com/public/images/...``` yang memiliki substring eden
+
+![Dokumentasi 17-1](image/Nomor%2017/nomor%2017-1.png)
+
+![Dokumentasi 17-2](image/Nomor%2017/nomor%2017-2.png)
