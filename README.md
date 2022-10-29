@@ -300,10 +300,188 @@ Kemudian lakukan ping pada salah satu client:
 ## Nomor 6
 
 ### Soal
+Karena banyak informasi dari Handler, buatlah subdomain yang khusus untuk operation yaitu `operation.wise.yyy.com` dengan alias `www.operation.wise.yyy.com` yang didelegasikan dari `WISE` ke `Berlint` dengan IP menuju ke `Eden` dalam folder `operation`.
 
-Karena banyak informasi dari Handler, buatlah subdomain yang khusus untuk operation yaitu operation.wise.yyy.com dengan alias www.operation.wise.yyy.com yang didelegasikan dari WISE ke Berlint dengan IP menuju ke Eden dalam folder operation!
+<br>
 
-### Cara Pengerjaan
+### Jawaban
+
+### Server WISE
+Tambahkan konfigurasi berikut ke `/etc/bind/wise/wise.A06.com` pada `zone "wise.A06.com"`.
+```
+ns1             IN      A       10.2.2.3
+operation       IN      NS      ns1
+```
+Tambahkan konfigurasi berikut ke `/etc/bind/named.conf.options`.
+```
+allow-query{any;};
+```
+Tambahkan konfigurasi berikut ke `/etc/bind/named.conf.local` di `zone "wise.a06.com"`.
+```
+allow-transfer { 10.2.2.2; };
+```
+Lalu, lakukan restart sevice bind9 dengan `service bind9 restart`.
+
+### Server Berlint
+Tambahkan konfigurasi berikut ke `/etc/bind/named.conf.options`.
+```
+allow-query{any;};
+```
+Lalu tambahkan konfigurasi berikut untuk delegasi `operation.wise.A06.com`.
+```
+zone \"operation.wise.A06.com\" {
+        type master;
+        file \"/etc/bind/wise/operation.wise.A06.com\";
+};
+```
+
+### Testing
+
+![Testing No 6](image/Nomor%206/1.png)
+
+## Nomor 7
+
+### Soal
+Untuk informasi yang lebih spesifik mengenai Operation Strix, buatlah subdomain
+melalui `Berlint` dengan akses `strix.operation.wise.yyy.com` dengan alias
+`www.strix.operation.wise.yyy.com` yang mengarah ke `Eden`.
+
+### Jawaban
+Tambahkan konfigurasi berikut ke `/etc/bind/wise/operation.wise.A06.com`.
+```
+strix           IN      A       10.2.2.3
+www.strix       IN      CNAME   strix
+```
+
+### Testing
+![Testing No 7](image/Nomor%207/1.png)
+## Nomor 8
+
+### Soal
+Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver.
+Pertama dengan webserver `www.wise.yyy.com`. Pertama, Loid membutuhkan webserver
+dengan `DocumentRoot` pada `/var/www/wise.yyy.com`.
+
+### Jawaban
+
+### Client ( atau Garden)
+Install `lynx` terlebih dahulu.
+```
+apt-get update
+apt-get install lynx -y
+```
+### Server Eden
+Install `Apache` dan `php` terlebih dahulu dan dijalankan.
+```
+apt-get update
+apt-get install apache2 -y
+apt-get install php -y
+apt-get install libapache2-mod-php7.0
+service apache2 start
+service php start
+```
+Buat file konfigurasi `/etc/apache2/sites-available/wise.A06.com.conf` lalu edit konfigurasi seperti sebagai berikut.
+```
+<VirtualHost *:80>
+
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/wise.A06.com
+        ServerName wise.A06.com
+        ServerAlias www.wise.A06.com
+
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+
+</VirtualHost>
+```
+Lalu, buat direktori `/var/www/wise.A06.com`, masukkan file requirement kedalamnya, lalu restart `apache`.
+```
+mkdir /var/www/wise.A06.com
+wget --no-check-certificate -q "https://drive.google.com/uc?export=download&id=1S0XhL9ViYN7TyCj2W66BNEXQD2AAAw2e" -O "/var/www/wise.A06.com/wise.zip"
+unzip -q -o "/var/www/wise.A06.com/wise.zip" "wise/*" -d "/var/www/wise.A06.com"
+service apache2 restart
+```
+
+### Testing
+![Testing No 8](image/Nomor%208/1.png)
+![Testing No 8](image/Nomor%208/2.png)
+## Nomor 9
+
+### Soal
+Setelah itu, Loid juga
+membutuhkan agar url `www.wise.yyy.com/index.php/home` dapat menjadi menjadi
+`www.wise.yyy.com/home`
+
+### Jawaban
+Konfigurasikan file `/var/www/eden.wise.A06.com/.htaccess` menggunakan konfigurasi berikut.
+```
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/public/images/(.*)eden(.*)
+RewriteCond %{REQUEST_URI} !/public/images/eden.png
+RewriteRule /.* http://eden.wise.A06.com/public/images/eden.png [L]
+```
+Lalu tambahkan konfigurasi berikut di `/etc/apache2/sites-available/eden.wise.A06.com.conf` dalam `<VirtualHost *:80>`.
+```
+<Directory /var/www/eden.wise.A06.com>
+	Options +FollowSymLinks -Multiviews
+	AllowOverride All
+</Directory>
+```
+### Testing
+![Testing No 9](image/Nomor%209/1.png)
+![Testing No 9](image/Nomor%209/2.png)
+## Nomor 10
+
+### Soal
+Setelah itu, pada subdomain `www.eden.wise.yyy`.com, Loid membutuhkan
+penyimpanan aset yang memiliki `DocumentRoot` pada `/var/www/eden.wise.yyy.com`.
+
+### Jawaban
+```
+## <VirtualHost *:80>
+
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/eden.wise.A06.com
+        ServerName eden.wise.A06.com
+        ServerAlias www.eden.wise.A06.com
+
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+		
+		<Directory /var/www/eden.wise.A06.com>
+			Options +FollowSymLinks -Multiviews
+			AllowOverride All
+		</Directory>
+
+</VirtualHost>
+```
+Lalu, nyalakan `virtualHost` dengan `a2ensite` dan buat direktori `/var/www/eden.wise.A06.com`, masukkan file requirement kedalamnya, lalu restart `apache`.
+```
+a2ensite eden.wise.A06.com
+mkdir /var/www/eden.wise.A06.com
+wget --no-check-certificate -q "https://drive.google.com/uc?id=1q9g6nM85bW5T9f5yoyXtDqonUKKCHOTV&export=download" -O "/var/www/eden.wise.A06.com/eden.wise.zip"
+unzip -q -o "/var/www/eden.wise.A06.com/eden.wise.zip" "eden.wise/*" -d "/var/www/eden.wise.A06.com"
+service apache2 restart
+```
+### Testing
+![Testing No 10](image/Nomor%2010/1.png)
+![Testing No 10](image/Nomor%2010/2.png)
+Nomor 11
+
+### Soal
+Akan tetapi, pada folder `/public`, Loid ingin hanya dapat melakukan directory listing saja.
+
+### Jawaban
+Tambahkan konfigurasi berikut ini di `/etc/apache2/sites-available/eden.wise.A06.com.conf` dalam `<VirtualHost *:80>`.
+```
+<Directory /var/www/eden.wise.A06.com/public>
+	Options +Indexes
+</Directory>
+```
+### Testing
+![Testing No 11](image/Nomor%2011/1.png)
+![Testing No 11](image/Nomor%2011/2.png)
+
 
 
 ## Nomor 12
