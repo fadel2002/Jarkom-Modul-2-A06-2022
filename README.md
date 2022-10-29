@@ -302,9 +302,8 @@ Kemudian lakukan ping pada salah satu client:
 ### Soal
 Karena banyak informasi dari Handler, buatlah subdomain yang khusus untuk operation yaitu `operation.wise.yyy.com` dengan alias `www.operation.wise.yyy.com` yang didelegasikan dari `WISE` ke `Berlint` dengan IP menuju ke `Eden` dalam folder `operation`.
 
-<br>
-
 ### Jawaban
+>>>>>>> 51a68a2ef06225830ba85bbf090d2e84b6e97f18
 
 ### Server WISE
 Tambahkan konfigurasi berikut ke `/etc/bind/wise/wise.A06.com` pada `zone "wise.A06.com"`.
@@ -481,8 +480,6 @@ Tambahkan konfigurasi berikut ini di `/etc/apache2/sites-available/eden.wise.A06
 ### Testing
 ![Testing No 11](image/Nomor%2011/1.png)
 ![Testing No 11](image/Nomor%2011/2.png)
-
-
 
 ## Nomor 12
 
@@ -718,3 +715,8 @@ yang berfungsi mengubah semua request pada ```http://eden.wise.A06.com/public/im
 ![Dokumentasi 17-1](image/Nomor%2017/nomor%2017-1.png)
 
 ![Dokumentasi 17-2](image/Nomor%2017/nomor%2017-2.png)
+
+## Dokumentasi pengerjaan
+![Dokumentasi 1](/image/01.png)
+
+![Dokumentasi 2](/image/02.png)
