@@ -303,7 +303,7 @@ Kemudian lakukan ping pada salah satu client:
 Karena banyak informasi dari Handler, buatlah subdomain yang khusus untuk operation yaitu `operation.wise.yyy.com` dengan alias `www.operation.wise.yyy.com` yang didelegasikan dari `WISE` ke `Berlint` dengan IP menuju ke `Eden` dalam folder `operation`.
 
 ### Jawaban
->>>>>>> 51a68a2ef06225830ba85bbf090d2e84b6e97f18
+<br>
 
 ### Server WISE
 Tambahkan konfigurasi berikut ke `/etc/bind/wise/wise.A06.com` pada `zone "wise.A06.com"`.
