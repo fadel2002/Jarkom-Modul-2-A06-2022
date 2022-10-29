@@ -1,4 +1,4 @@
-# Modul Jarkom Kelompok A06
+# Lapres Jarkom Kelompok A06
 
 ## Anggota Kelompok
 
